@@ -13,9 +13,13 @@ app.use(express.static('public'));
 
 // ✅ Database connection
 const db = mysql.createConnection({
-  host: 'localhost',
+  // host: 'localhost',
+  // user: 'root',             // your MySQL username
+  // password: 'Kanika_10',// the password you set during installation
+  // database: 'petalverse_db' // your created DB
+  host: 'trolley.proxy.rlwy.net',
   user: 'root',             // your MySQL username
-  password: 'Kanika_10',// the password you set during installation
+  password: 'TtWlkWSdIbagpmFeUCjccXbVoyqoYNTP',// the password you set during installation
   database: 'petalverse_db' // your created DB
 });
 
