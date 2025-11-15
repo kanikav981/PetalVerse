@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Cart | PetalVerse</title>
+  <link rel="stylesheet" href="css/shop.css">
+  <link rel="stylesheet" href="css/cart.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo"><span>PetalVerse</span></a>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="wishlist.html">Wishlist</a>
+      <a href="cart.html" class="active">Cart</a>
+    </nav>
+  </header>
+
+  <section class="products">
+    <h1 class="heading">Your <span>Cart</span></h1>
+    <div class="card_container" id="cartContainer"></div>
+    <button id="placeOrderBtn" class="btn" style="display:none;">Place Order</button>
+  </section>
+
+  <!-- Popup -->
+  <div id="successPopup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+       background:#fff;border:2px solid #fb6f92;padding:20px 40px;border-radius:10px;z-index:999;">
+    <p style="font-size:1.6rem;color:#333;text-align:center;"></p>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return alert("Please log in first.");
+
+    const res = await fetch(`http://localhost:5000/cart/${user.email}`);
+    const cart = await res.json();
+
+    const container = document.getElementById("cartContainer");
+    const orderBtn = document.getElementById("placeOrderBtn");
+    const popup = document.getElementById("successPopup");
+
+    if (cart.length > 0) orderBtn.style.display = "block";
+
+    container.innerHTML = cart.map(item => `
+      <div class="card">
+        <div class="card_img">
+          <img src="images/${item.image}">
+        </div>
+        <div class="content">
+          <h3>${item.name}</h3>
+          <div class="price">INR ${item.price}</div>
+          <p>Quantity: ${item.quantity}</p>
+          <button onclick="removeCart(${item.id})" class="btn">Remove</button>
+        </div>
+      </div>
+    `).join('');
+
+    orderBtn.addEventListener("click", async () => {
+      await fetch("http://localhost:5000/cart/place-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email })
+      });
+
+      popup.querySelector("p").textContent = "🎉 Order placed successfully!";
+      popup.style.display = "flex";
+      setTimeout(() => location.reload(), 2000);
+    });
+  });
+
+  async function removeCart(id) {
+    await fetch(`http://localhost:5000/cart/${id}`, { method: "DELETE" });
+    alert("Item removed from cart!");
+    location.reload();
+  }
+  </script>
+  
+  <!-- Order Success Popup -->
+<div id="successPopup">
+  <div class="popup-content">
+    <i class="fa-solid fa-circle-check"></i>
+    <h3>Order Placed Successfully!</h3>
+    <p>Thank you for shopping with PetalVerse 🌸</p>
+  </div>
+</div>
+
+</body>
+</html>
